@@ -133,7 +133,7 @@ mod test {
 
     fn default_seed() -> Seed {
         let mn = Mnemonic::from_phrase(
-            "inject kidney empty canal shadow pact comfort wife crush horse wife sketch",
+            "club behind enforce pitch analyst blossom skull entry occur speak hotel clever",
             Language::English,
         )
         .unwrap();
@@ -142,29 +142,55 @@ mod test {
 
     #[test]
     fn from_seed_test() {
-        let seed = hex::decode("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542").unwrap();
+        let mn = "club behind enforce pitch analyst blossom skull entry occur speak hotel clever";
+        //let seed = hex::decode("402f44cbd9a2070a20f58abdcbc1b1662863cd2ba2d941fe78ff934fdedffc293214c93364c6d37403b3d59d91589efb8ff8ecfa1642dafda451a34b397d1499").unwrap();
         //        println!("{}", hex::encode(default_seed().as_bytes()));
         //master key
-        let esk = Ed25519DeterministicPrivateKey::from_seed(&seed).unwrap();
-        assert_eq!(
-            "171cb88b1b3c1db25add599712e36245d75bc65a1a5c9e18d76f9f2b1eab4012",
+        //let esk = Ed25519DeterministicPrivateKey::from_seed(&seed).unwrap();
+
+        let esk = Ed25519DeterministicPrivateKey::from_mnemonic(mn).unwrap();
+        println!("root sk: {}",
             hex::encode(esk.0.private_key().to_bytes())
         );
-        assert_eq!(
-            "ef70a74db9c3a5af931b5fe73ed8e1a53464133654fd55e7a66f8570b8e33c3b",
+        println!("root pk: {}",
             hex::encode(esk.0.chain_code().to_bytes())
         );
 
+        let paths = [
+            "m/44'/354'",
+            "m/44'/354'/0'",
+            "m/44'/354'/0'/0'",
+            "m/44'/354'/0'/0'/0'",
+            "m/44'/354'/0'/0'/0'/0'",
+            "m/44'/434'",
+            "m/44'/434'/0'",
+            "m/44'/434'/0'/0'",
+            "m/44'/434'/0'/0'/0'",
+            "m/44'/434'/0'/0'/0'/0'",
+        ];
+
+        for path in &paths {
+            let derived_result = esk.derive(path).unwrap().0;
+            println!(
+                "{}, {}, {}",
+                hex::encode(derived_result.private_key().to_bytes()),
+                hex::encode(derived_result.chain_code().to_bytes()),
+                path,
+            );
+        }
+
+        /*
         //extended key
-        let path = "m/0'/2147483647'/1'/2147483646'/2'";
+        let path = "m/44'/354'";
         let derived_result = esk.derive(path).unwrap().0;
-        assert_eq!(
-            "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d",
-            hex::encode(derived_result.private_key().to_bytes())
-        );
+        //assert_eq!(
+        //    "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d",
+        //    hex::encode(derived_result.private_key().to_bytes())
+        //);
         assert_eq!(
             "5d70af781f3a37b829f0d060924d5e960bdc02e85423494afc0b1a41bbe196d4",
             hex::encode(derived_result.chain_code().to_bytes())
         );
+        */
     }
 }
